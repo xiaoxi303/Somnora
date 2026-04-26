@@ -25,15 +25,15 @@ jobs:
       - name: Generate Xcode Project
         run: xcodegen generate
 
-      - name: Build for Generic iOS Device
+      - name: Archive for Generic iOS Device
         run: |
-          xcodebuild build \
+          xcodebuild archive \
             -project Somnora.xcodeproj \
             -scheme Somnora \
             -configuration Release \
             -sdk iphoneos \
             -destination 'generic/platform=iOS' \
-            -derivedDataPath build \
+            -archivePath build/Somnora.xcarchive \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
@@ -41,16 +41,15 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p Payload
-          # Standard location when using -derivedDataPath
-          APP_PATH="build/Build/Products/Release-iphoneos/Somnora.app"
+          # Extract .app from the archive
+          APP_PATH="build/Somnora.xcarchive/Products/Applications/Somnora.app"
           
           if [ ! -d "$APP_PATH" ]; then
-            echo "Error: .app folder not found at $APP_PATH"
+            echo "Error: .app folder not found in archive at $APP_PATH"
             exit 1
           fi
           
-          echo "Packaging App from: $APP_PATH"
-          # Use ditto to preserve permissions and attributes
+          echo "Packaging App from Archive: $APP_PATH"
           ditto "$APP_PATH" "Payload/Somnora.app"
           zip -ry Somnora_Unsigned.ipa Payload
           
