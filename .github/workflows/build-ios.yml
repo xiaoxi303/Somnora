@@ -30,19 +30,10 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync ios
 
-      - name: Modify iOS Target Version
-        run: |
-          sed -i '' "s/platform :ios, '13.0'/platform :ios, '16.5'/g" ios/App/Podfile
-
-      - name: Install Cocoapods
-        run: |
-          cd ios/App
-          pod install
-
       - name: Build Unsigned App
         run: |
           cd ios/App
-          xcodebuild -workspace App.xcworkspace \
+          xcodebuild -project App.xcodeproj \
             -scheme App \
             -configuration Release \
             -sdk iphoneos \
