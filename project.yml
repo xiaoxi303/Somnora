@@ -12,14 +12,16 @@ targets:
       CURRENT_PROJECT_VERSION: 1
       INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
-      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
-      ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: NO
-      TARGETED_DEVICE_FAMILY: 1
       PRODUCT_BUNDLE_IDENTIFIER: com.xiaoxi303.Somnora
     info:
       path: Somnora/Info.plist
       properties:
         NSHealthShareUsageDescription: "Somnora 需要读取您的睡眠数据，用于生成睡眠分析、趋势和健康建议。"
         NSHealthUpdateUsageDescription: "Somnora 将同步您的睡眠记录到健康 App。"
+        CFBundleIcons:
+          CFBundlePrimaryIcon:
+            CFBundleIconFiles:
+              - AppIcon60x60
+            UIPrerenderedIcon: NO
     entitlements:
       path: Somnora/Somnora.entitlements
