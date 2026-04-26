@@ -20,7 +20,7 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
 
   return (
     <div className="glass-bottom-bar backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
-      {navItems.map((item, index) => {
+      {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;
         
@@ -36,7 +36,7 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
                 drag="x"
                 dragConstraints={{ left: 0, right: 0 }}
                 dragElastic={0.6}
-                onDragEnd={(e, info) => {
+                onDragEnd={(_, info) => {
                   const offset = info.offset.x;
                   const steps = Math.round(offset / 70); // 约70px为一个tab的间距
                   let nextIndex = currentIndex + steps;
