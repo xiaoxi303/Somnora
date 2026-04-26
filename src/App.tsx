@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Activity, Heart, Wind, Power } from 'lucide-react';
+import { Activity, Heart, Wind, Power, Moon, BarChart2, Settings } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import BottomNav from './components/BottomNav';
 import SleepRing from './components/SleepRing';
@@ -9,6 +9,7 @@ import { HealthService } from './services/HealthService';
 function App() {
   const [isSleeping, setIsSleeping] = useState(false);
   const [healthAuthorized, setHealthAuthorized] = useState(false);
+  const [activeTab, setActiveTab] = useState('home');
 
   useEffect(() => {
     // 隐藏启动页
@@ -61,81 +62,136 @@ function App() {
 
       {/* 主体内容 */}
       <main className="px-6 relative z-10">
-        <SleepRing hours="7" minutes="30" progress={0.8} />
-
-        <div className="flex gap-4 mb-6">
-          <StatsGlassCard 
-            icon={Activity} 
-            title="深度睡眠" 
-            value="2.5" 
-            unit="h" 
-            color="#A78BFA" // Purple
-          />
-          <StatsGlassCard 
-            icon={Heart} 
-            title="平均心率" 
-            value="58" 
-            unit="bpm" 
-            color="#F472B6" // Pink
-          />
-        </div>
-
-        <div className="glass-card mb-24">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center space-x-2">
-              <div className="p-2 rounded-xl bg-[#60A5FA]/10 border border-[#60A5FA]/20 text-[#60A5FA]">
-                <Wind size={18} />
-              </div>
-              <span className="text-sm text-white/60 font-medium">呼吸频率</span>
-            </div>
-            <span className="text-sm font-medium text-[#60A5FA]">14 次/分</span>
-          </div>
-          
-          <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-            <motion.div 
-              initial={{ width: 0 }}
-              animate={{ width: '60%' }}
-              transition={{ duration: 1, delay: 0.5 }}
-              className="h-full bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] rounded-full relative"
+        
+        <AnimatePresence mode="wait">
+          {activeTab === 'home' && (
+            <motion.div
+              key="home"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              transition={{ duration: 0.3 }}
             >
-              <div className="absolute top-0 right-0 bottom-0 w-8 bg-white/30 blur-sm mix-blend-overlay" />
-            </motion.div>
-          </div>
-        </div>
+              <SleepRing hours="7" minutes="30" progress={0.8} />
 
-        {/* 开始睡眠悬浮按钮 */}
-        <div className="fixed bottom-28 left-0 right-0 flex justify-center z-40 pointer-events-none">
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={toggleSleep}
-            className="pointer-events-auto relative group flex items-center justify-center"
-          >
-            {/* 发光涟漪效果 */}
-            <AnimatePresence>
-              {isSleeping && (
-                <motion.div
-                  initial={{ opacity: 0.8, scale: 0.8 }}
-                  animate={{ opacity: 0, scale: 1.5 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                  className="absolute inset-0 bg-[#00F2FE] rounded-full blur-xl"
+              <div className="flex gap-4 mb-6">
+                <StatsGlassCard 
+                  icon={Activity} 
+                  title="深度睡眠" 
+                  value="2.5" 
+                  unit="h" 
+                  color="#A78BFA" // Purple
                 />
-              )}
-            </AnimatePresence>
-            
-            <div className={`
-              relative w-16 h-16 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all duration-500
-              ${isSleeping 
-                ? 'bg-[#00F2FE]/20 border-[#00F2FE]/50 text-[#00F2FE] shadow-[0_0_30px_rgba(0,242,254,0.4)]' 
-                : 'glass text-white/80 border-white/10 shadow-lg'}
-            `}>
-              <Power size={24} className={isSleeping ? "drop-shadow-[0_0_8px_rgba(0,242,254,0.8)]" : ""} />
-            </div>
-          </motion.button>
-        </div>
+                <StatsGlassCard 
+                  icon={Heart} 
+                  title="平均心率" 
+                  value="58" 
+                  unit="bpm" 
+                  color="#F472B6" // Pink
+                />
+              </div>
+
+              <div className="glass-card mb-24">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center space-x-2">
+                    <div className="p-2 rounded-xl bg-[#60A5FA]/10 border border-[#60A5FA]/20 text-[#60A5FA]">
+                      <Wind size={18} />
+                    </div>
+                    <span className="text-sm text-white/60 font-medium">呼吸频率</span>
+                  </div>
+                  <span className="text-sm font-medium text-[#60A5FA]">14 次/分</span>
+                </div>
+                
+                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                  <motion.div 
+                    initial={{ width: 0 }}
+                    animate={{ width: '60%' }}
+                    transition={{ duration: 1, delay: 0.5 }}
+                    className="h-full bg-gradient-to-r from-[#3B82F6] to-[#60A5FA] rounded-full relative"
+                  >
+                    <div className="absolute top-0 right-0 bottom-0 w-8 bg-white/30 blur-sm mix-blend-overlay" />
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* 开始睡眠悬浮按钮 */}
+              <div className="fixed bottom-28 left-0 right-0 flex justify-center z-40 pointer-events-none">
+                <motion.button
+                  whileTap={{ scale: 0.95 }}
+                  onClick={toggleSleep}
+                  className="pointer-events-auto relative group flex items-center justify-center"
+                >
+                  <AnimatePresence>
+                    {isSleeping && (
+                      <motion.div
+                        initial={{ opacity: 0.8, scale: 0.8 }}
+                        animate={{ opacity: 0, scale: 1.5 }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 2, repeat: Infinity }}
+                        className="absolute inset-0 bg-[#00F2FE] rounded-full blur-xl"
+                      />
+                    )}
+                  </AnimatePresence>
+                  
+                  <div className={`
+                    relative w-16 h-16 rounded-full flex items-center justify-center backdrop-blur-xl border transition-all duration-500
+                    ${isSleeping 
+                      ? 'bg-[#00F2FE]/20 border-[#00F2FE]/50 text-[#00F2FE] shadow-[0_0_30px_rgba(0,242,254,0.4)]' 
+                      : 'glass text-white/80 border-white/10 shadow-lg'}
+                  `}>
+                    <Power size={24} className={isSleeping ? "drop-shadow-[0_0_8px_rgba(0,242,254,0.8)]" : ""} />
+                  </div>
+                </motion.button>
+              </div>
+            </motion.div>
+          )}
+
+          {activeTab === 'sleep' && (
+            <motion.div
+              key="sleep"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex flex-col items-center justify-center h-[60vh]"
+            >
+              <Moon size={64} className="text-[#00F2FE] mb-6 drop-shadow-[0_0_15px_rgba(0,242,254,0.6)]" />
+              <h2 className="text-2xl font-bold text-white mb-2">睡眠记录</h2>
+              <p className="text-white/50 text-center px-8">您的所有睡眠波形和历史记录将在此处呈现。</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'stats' && (
+            <motion.div
+              key="stats"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex flex-col items-center justify-center h-[60vh]"
+            >
+              <BarChart2 size={64} className="text-[#A78BFA] mb-6 drop-shadow-[0_0_15px_rgba(167,139,250,0.6)]" />
+              <h2 className="text-2xl font-bold text-white mb-2">数据统计</h2>
+              <p className="text-white/50 text-center px-8">本周、本月的睡眠趋势和健康分析报告将在此呈现。</p>
+            </motion.div>
+          )}
+
+          {activeTab === 'settings' && (
+            <motion.div
+              key="settings"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex flex-col items-center justify-center h-[60vh]"
+            >
+              <Settings size={64} className="text-white/40 mb-6" />
+              <h2 className="text-2xl font-bold text-white mb-2">偏好设置</h2>
+              <p className="text-white/50 text-center px-8">在这里调整您的睡眠目标、智能闹钟及数据同步设置。</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </main>
 
-      <BottomNav />
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
     </div>
   );
 }
