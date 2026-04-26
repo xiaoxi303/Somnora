@@ -37,11 +37,12 @@ struct FloatingTabBar: View {
                             )
                     )
                     .background(
-                        #available(iOS 26.0, *) {
-                            // AnyView(EmptyView().glassEffect()) // iOS 26 Placeholder
-                            AnyView(Capsule().fill(.white.opacity(0.05)))
-                        } else {
-                            AnyView(EmptyView())
+                        Group {
+                            if #available(iOS 26.0, *) {
+                                Color.white.opacity(0.05)
+                            } else {
+                                Color.clear
+                            }
                         }
                     )
                     .frame(width: tabWidth - 8, height: 48) // Slightly smaller than tab area to fit inside padding

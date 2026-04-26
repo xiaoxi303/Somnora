@@ -8,11 +8,7 @@ struct LiquidGlassModifier: ViewModifier {
         if #available(iOS 18.0, *) { // iOS 26 context, but mapping to actual current/near-future APIs
             content
                 .background(.ultraThinMaterial)
-                .background(
-                    #available(iOS 26.0, *) ? 
-                    AnyView(Color.clear) : // Placeholder for actual iOS 26 glass effect
-                    AnyView(Color.white.opacity(0.05))
-                )
+                .modifier(GlassEffectModifier())
                 .clipShape(RoundedRectangle(cornerRadius: cornerRadius))
                 .overlay(
                     RoundedRectangle(cornerRadius: cornerRadius)
@@ -70,7 +66,12 @@ extension View {
     }
 }
 
-// iOS 26 Placeholder Compatibility
-#if !canImport(UIKit) || !compiler(>=6.0)
-// If compiler doesn't support iOS 26 SDK yet, we simulate or handle it via #available checks in code.
-#endif
+struct GlassEffectModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if #available(iOS 26.0, *) {
+            content // Placeholder for future glassEffect()
+        } else {
+            content.background(Color.white.opacity(0.05))
+        }
+    }
+}
