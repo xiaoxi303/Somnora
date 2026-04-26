@@ -28,7 +28,7 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
           <button
             key={item.id}
             onClick={() => setActiveTab(item.id)}
-            className="relative p-3 rounded-2xl flex flex-col items-center justify-center transition-all duration-300 w-16"
+            className="relative py-2 px-3 flex flex-col items-center justify-center transition-all duration-300 w-16"
           >
             {isActive && (
               <motion.div
@@ -53,10 +53,10 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
               />
             )}
             <Icon 
-              size={24} 
-              className={`relative z-10 pointer-events-none transition-colors duration-300 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/50'}`} 
+              size={20} 
+              className={`relative z-10 pointer-events-none transition-colors duration-300 mb-1 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/50'}`} 
             />
-            <span className={`text-[10px] mt-1 relative z-10 pointer-events-none transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/50'}`}>
+            <span className={`text-[10px] relative z-10 pointer-events-none transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/50'}`}>
               {item.label}
             </span>
           </button>
