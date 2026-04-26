@@ -17,8 +17,12 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
   ];
 
   return (
-    <div 
-      className="glass-bottom-bar backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]"
+    <motion.div 
+      drag
+      dragConstraints={{ top: -500, bottom: 20, left: -20, right: 20 }}
+      dragElastic={0.4}
+      whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+      className="glass-bottom-bar backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] touch-none cursor-grab"
     >
       {navItems.map((item) => {
         const Icon = item.icon;
@@ -48,6 +52,6 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
           </button>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
