@@ -45,13 +45,27 @@ jobs:
           APP_PATH="build/Somnora.xcarchive/Products/Applications/Somnora.app"
           
           if [ ! -d "$APP_PATH" ]; then
-            echo "Error: .app folder not found in archive at $APP_PATH"
+            echo "❌ Error: .app folder not found in archive!"
             exit 1
           fi
           
-          echo "Packaging App from Archive: $APP_PATH"
+          echo "🔍 Auditing .app contents:"
+          ls -lhR "$APP_PATH"
+          
+          # Check if the main executable exists
+          EXECUTABLE="$APP_PATH/Somnora"
+          if [ ! -f "$EXECUTABLE" ]; then
+            echo "❌ CRITICAL ERROR: Main executable 'Somnora' is missing!"
+            # Try to find any executable in the folder just in case
+            ls -F "$APP_PATH"
+            exit 1
+          fi
+          
+          echo "📦 Packaging App from Archive: $APP_PATH"
           ditto "$APP_PATH" "Payload/Somnora.app"
-          zip -ry Somnora_Unsigned.ipa Payload
+          
+          echo "🤐 Zipping IPA..."
+          zip -r Somnora_Unsigned.ipa Payload
           
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
