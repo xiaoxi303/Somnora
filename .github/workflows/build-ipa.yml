@@ -1,0 +1,50 @@
+name: Build Unsigned IPA
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Select Xcode version
+        run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
+
+      - name: Build for Generic iOS Device
+        run: |
+          xcodebuild build \
+            -project Somnora.xcodeproj \
+            -scheme Somnora \
+            -configuration Release \
+            -sdk iphoneos \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+
+      - name: Package IPA
+        run: |
+          mkdir -p Payload
+          # Find the .app file in the DerivedData or project folder
+          # When using 'build' without a custom output, it goes to DerivedData
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Somnora.app" -type d -not -path "*Index/*" | head -n 1)
+          
+          if [ -z "$APP_PATH" ]; then
+            echo "Could not find .app file"
+            exit 1
+          fi
+          
+          echo "Found App at: $APP_PATH"
+          cp -r "$APP_PATH" Payload/
+          zip -r Somnora_Unsigned.ipa Payload
+          
+      - name: Upload Unsigned IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Somnora-Unsigned-IPA
+          path: Somnora_Unsigned.ipa
