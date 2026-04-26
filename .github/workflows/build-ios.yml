@@ -1,0 +1,65 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-ios:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build Web Assets
+        run: npm run build
+
+      - name: Generate iOS Icons
+        run: npx @capacitor/assets generate --ios
+
+      - name: Sync Capacitor
+        run: npx cap sync ios
+
+      - name: Modify iOS Target Version
+        run: |
+          sed -i '' "s/platform :ios, '13.0'/platform :ios, '16.5'/g" ios/App/Podfile
+
+      - name: Install Cocoapods
+        run: |
+          cd ios/App
+          pod install
+
+      - name: Build Unsigned App
+        run: |
+          cd ios/App
+          xcodebuild -workspace App.xcworkspace \
+            -scheme App \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Package into IPA
+        run: |
+          mkdir -p Payload
+          # xcodebuild outputs to build/Build/Products/Release-iphoneos/App.app
+          cp -r ios/App/build/Build/Products/Release-iphoneos/App.app Payload/
+          zip -r Somnara.ipa Payload
+
+      - name: Upload IPA Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Somnara-iOS-Unsigned
+          path: Somnara.ipa
