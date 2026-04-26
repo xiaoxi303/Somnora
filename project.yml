@@ -13,6 +13,8 @@ targets:
       INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+      ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS: NO
+      TARGETED_DEVICE_FAMILY: 1
     info:
       path: Somnora/Info.plist
       properties:
