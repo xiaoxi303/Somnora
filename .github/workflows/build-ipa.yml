@@ -4,6 +4,9 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
+  
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -55,3 +58,13 @@ jobs:
         with:
           name: Somnora-Unsigned-IPA
           path: Somnora_Unsigned.ipa
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        if: github.ref == 'refs/heads/main'
+        with:
+          tag_name: latest
+          name: "Somnora 最新预览版"
+          body: "这是自动构建的最新无签名 iOS 安装包。请下载后使用全能签、巨魔或 Sideloadly 安装。"
+          files: Somnora_Unsigned.ipa
+          make_latest: true
