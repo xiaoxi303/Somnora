@@ -16,6 +16,12 @@ jobs:
       - name: Select Xcode version
         run: sudo xcode-select -s /Applications/Xcode_16.0.app/Contents/Developer
 
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Generate Xcode Project
+        run: xcodegen generate
+
       - name: Build for Generic iOS Device
         run: |
           xcodebuild build \
