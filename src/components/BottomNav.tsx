@@ -17,7 +17,13 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
   ];
 
   return (
-    <div className="glass-bottom-bar backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
+    <motion.div 
+      drag
+      dragConstraints={{ top: -500, bottom: 20, left: -20, right: 20 }}
+      dragElastic={0.4}
+      whileDrag={{ scale: 1.05, cursor: "grabbing" }}
+      className="glass-bottom-bar backdrop-blur-2xl bg-white/5 border border-white/10 shadow-[0_8px_32px_0_rgba(0,0,0,0.3)] touch-none cursor-grab"
+    >
       {navItems.map((item) => {
         const Icon = item.icon;
         const isActive = activeTab === item.id;
@@ -31,14 +37,14 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
             {isActive && (
               <motion.div
                 layoutId="active-bg"
-                className="absolute inset-0 bg-white/20 rounded-2xl"
+                className="absolute inset-0 bg-white/20 rounded-[1.2rem]"
                 initial={false}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               />
             )}
             <Icon 
               size={24} 
-              className={`relative z-10 transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/50'}`} 
+              className={`relative z-10 transition-colors duration-300 ${isActive ? 'text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]' : 'text-white/50'}`} 
             />
             <span className={`text-[10px] mt-1 relative z-10 transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/50'}`}>
               {item.label}
@@ -46,6 +52,6 @@ export default function BottomNav({ activeTab, setActiveTab }: Props) {
           </button>
         );
       })}
-    </div>
+    </motion.div>
   );
 }
