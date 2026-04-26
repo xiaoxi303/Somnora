@@ -13,6 +13,8 @@ targets:
       INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       PRODUCT_BUNDLE_IDENTIFIER: com.xiaoxi303.Somnora
+      COMPRESS_PNG_FILES: NO
+      IPHONEOS_DEPLOYMENT_TARGET: "16.5"
     info:
       path: Somnora/Info.plist
       properties:
@@ -22,6 +24,7 @@ targets:
           CFBundlePrimaryIcon:
             CFBundleIconFiles:
               - AppIcon60x60
+              - AppIcon1024
             UIPrerenderedIcon: NO
     entitlements:
       path: Somnora/Somnora.entitlements
