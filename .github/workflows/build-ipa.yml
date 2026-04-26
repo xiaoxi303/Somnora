@@ -4,14 +4,14 @@ on:
   push:
     branches: [ "main" ]
   workflow_dispatch:
-  
+
 permissions:
   contents: write
 
 jobs:
   build:
     runs-on: macos-latest
-    
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -22,11 +22,16 @@ jobs:
       - name: Install XcodeGen
         run: brew install xcodegen
 
+      - name: Clean build output
+        run: rm -rf build Payload Somnora_Unsigned.ipa bundle-audit.txt
+
       - name: Generate Xcode Project
         run: xcodegen generate
 
       - name: Archive for Generic iOS Device
         run: |
+          set -euo pipefail
+
           xcodebuild archive \
             -project Somnora.xcodeproj \
             -scheme Somnora \
@@ -40,38 +45,80 @@ jobs:
 
       - name: Package IPA
         run: |
-          mkdir -p Payload
-          # Extract .app from the archive
+          set -euo pipefail
+
+          rm -rf Payload Somnora_Unsigned.ipa bundle-audit.txt
           APP_PATH="build/Somnora.xcarchive/Products/Applications/Somnora.app"
-          
+          IPA_PATH="Somnora_Unsigned.ipa"
+          MIN_IPA_BYTES=$((300 * 1024))
+
+          {
+            echo "Somnora bundle audit"
+            echo "Generated at: $(date -u '+%Y-%m-%dT%H:%M:%SZ')"
+            echo "App path: $APP_PATH"
+            echo
+          } | tee bundle-audit.txt
+
           if [ ! -d "$APP_PATH" ]; then
-            echo "❌ Error: .app folder not found in archive!"
+            echo "ERROR: .app folder not found in archive: $APP_PATH" | tee -a bundle-audit.txt
             exit 1
           fi
-          
-          echo "🔍 Auditing .app contents:"
-          ls -lhR "$APP_PATH"
-          
-          # Check if the main executable exists
-          EXECUTABLE="$APP_PATH/Somnora"
-          if [ ! -f "$EXECUTABLE" ]; then
-            echo "❌ CRITICAL ERROR: Main executable 'Somnora' is missing!"
-            # Try to find any executable in the folder just in case
-            ls -F "$APP_PATH"
+
+          {
+            echo "Top-level .app contents:"
+            ls -lah "$APP_PATH"
+            echo
+            echo "Recursive .app file list:"
+            find "$APP_PATH" -print | sort
+            echo
+            echo ".app disk usage:"
+            du -sh "$APP_PATH"
+            echo
+          } | tee -a bundle-audit.txt
+
+          for required in "$APP_PATH/Somnora" "$APP_PATH/Info.plist" "$APP_PATH/Assets.car"; do
+            if [ ! -e "$required" ]; then
+              echo "ERROR: Required bundle file is missing: $required" | tee -a bundle-audit.txt
+              exit 1
+            fi
+          done
+
+          if [ ! -s "$APP_PATH/Somnora" ]; then
+            echo "ERROR: Main executable exists but is empty: $APP_PATH/Somnora" | tee -a bundle-audit.txt
             exit 1
           fi
-          
-          echo "📦 Packaging App from Archive: $APP_PATH"
+
+          mkdir -p Payload
           ditto "$APP_PATH" "Payload/Somnora.app"
-          
-          echo "🤐 Zipping IPA..."
-          zip -r Somnora_Unsigned.ipa Payload
-          
+
+          ditto -c -k --sequesterRsrc --keepParent Payload "$IPA_PATH"
+
+          IPA_SIZE=$(stat -f%z "$IPA_PATH")
+          APP_SIZE=$(du -sk "$APP_PATH" | awk '{print $1 * 1024}')
+
+          {
+            echo "Packaged IPA:"
+            ls -lah "$IPA_PATH"
+            echo "App size bytes: $APP_SIZE"
+            echo "IPA size bytes: $IPA_SIZE"
+            echo
+            echo "IPA zip listing:"
+            unzip -l "$IPA_PATH"
+          } | tee -a bundle-audit.txt
+
+          if [ "$IPA_SIZE" -lt "$MIN_IPA_BYTES" ]; then
+            echo "ERROR: IPA is unexpectedly small: ${IPA_SIZE} bytes; expected at least ${MIN_IPA_BYTES} bytes." | tee -a bundle-audit.txt
+            exit 1
+          fi
+
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
         with:
           name: Somnora-Unsigned-IPA
-          path: Somnora_Unsigned.ipa
+          path: |
+            Somnora_Unsigned.ipa
+            bundle-audit.txt
+          if-no-files-found: error
 
       - name: Create Release
         uses: softprops/action-gh-release@v2

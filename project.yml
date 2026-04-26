@@ -7,12 +7,16 @@ targets:
     deploymentTarget: "16.5"
     sources:
       - path: Somnora
+        excludes:
+          - AppIcon1024.png
     settings:
       MARKETING_VERSION: 1.0.0
       CURRENT_PROJECT_VERSION: 1
+      ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
       INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: UIInterfaceOrientationPortrait
       INFOPLIST_KEY_UILaunchScreen_Generation: YES
       PRODUCT_BUNDLE_IDENTIFIER: com.xiaoxi303.Somnora
+      TARGETED_DEVICE_FAMILY: 1
       COMPRESS_PNG_FILES: NO
       IPHONEOS_DEPLOYMENT_TARGET: "16.5"
     info:
@@ -20,11 +24,5 @@ targets:
       properties:
         NSHealthShareUsageDescription: "Somnora 需要读取您的睡眠数据，用于生成睡眠分析、趋势和健康建议。"
         NSHealthUpdateUsageDescription: "Somnora 将同步您的睡眠记录到健康 App。"
-        CFBundleIcons:
-          CFBundlePrimaryIcon:
-            CFBundleIconFiles:
-              - AppIcon60x60
-              - AppIcon1024
-            UIPrerenderedIcon: NO
     entitlements:
       path: Somnora/Somnora.entitlements
