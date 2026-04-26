@@ -29,6 +29,7 @@ jobs:
             -scheme Somnora \
             -configuration Release \
             -sdk iphoneos \
+            -derivedDataPath build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY=""
@@ -36,18 +37,18 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p Payload
-          # Find the .app file in the DerivedData or project folder
-          # When using 'build' without a custom output, it goes to DerivedData
-          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "Somnora.app" -type d -not -path "*Index/*" | head -n 1)
+          # Standard location when using -derivedDataPath
+          APP_PATH="build/Build/Products/Release-iphoneos/Somnora.app"
           
-          if [ -z "$APP_PATH" ]; then
-            echo "Could not find .app file"
+          if [ ! -d "$APP_PATH" ]; then
+            echo "Error: .app folder not found at $APP_PATH"
             exit 1
           fi
           
-          echo "Found App at: $APP_PATH"
-          cp -r "$APP_PATH" Payload/
-          zip -r Somnora_Unsigned.ipa Payload
+          echo "Packaging App from: $APP_PATH"
+          # Use ditto to preserve permissions and attributes
+          ditto "$APP_PATH" "Payload/Somnora.app"
+          zip -ry Somnora_Unsigned.ipa Payload
           
       - name: Upload Unsigned IPA
         uses: actions/upload-artifact@v4
